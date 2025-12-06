@@ -3,80 +3,681 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIENDA VIRTUAL</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>J. Market - Tienda Virtual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        hr {
+            border-color: #ededed4f;
+        }
+
+        header {
+            width: 100%;
+            height: 72px;
+        }
+
+        header h1 {
+            color: #008ECC;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            height: 100%;
+            align-items: center;
+        }
+
+        nav #searchbar {
+            width: 20%;
+            height: 30%;
+            border-radius: 8px;
+            background-color: #F3F9FB;
+            padding: 20px;
+            border: none;
+            box-shadow: #00000041 0 0 2px;
+        }
+
+        nav #searchbar:focus {
+            outline: none;
+        }
+
+        nav ul {
+            display: flex;
+        }
+
+        nav ul li a {
+            padding: 22px;
+            cursor: pointer;
+        }
+
+        .cart-badge {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #FF4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .category-container {
+            display: flex;
+            margin: 0 auto;
+            width: 80%;
+            margin-top: 40px;
+        }
+
+        .category-container > .category {
+            margin: 0 auto;
+        }
+
+        .category-container > .category ul a {
+            background-color: #F3F9FB;
+            padding: 12px;
+            border-radius: 32px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-container > .category ul a:hover,
+        .category-container > .category ul a.active {
+            background-color: #008ECC;
+            color: white;
+        }
+
+        .container.producto {
+            display: flex;
+            margin: auto;
+            margin-top: 50px;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 85%;
+            margin-bottom: 50px;
+        }
+
+        .container.producto .card {
+            background-color: #F3F9FB;
+            width: 230px;
+            height: 380px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .container.producto .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .container.producto .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .container.producto .card.producto h2 {
+            font-size: 18px;
+            padding: 10px 12px;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .container.producto .card.producto .precio {
+            font-size: 20px;
+            font-weight: bold;
+            color: #008ECC;
+            padding: 0 12px;
+        }
+
+        .container.producto .card.producto .id-producto {
+            font-size: 14px;
+            color: #0000004f;
+            padding: 0 12px;
+            margin-top: 5px;
+        }
+
+        .btn-add-cart {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            background-color: #008ECC;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #006BA6;
+        }
+
+        /* Modal del carrito */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-modal.show {
+            display: flex;
+        }
+
+        .cart-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #F3F9FB;
+            padding-bottom: 15px;
+        }
+
+        .cart-header h2 {
+            color: #008ECC;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #F3F9FB;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-info p {
+            color: #008ECC;
+            font-weight: bold;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-remove {
+            background-color: #FF4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #F3F9FB;
+            text-align: right;
+        }
+
+        .cart-total h3 {
+            font-size: 24px;
+            color: #008ECC;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .btn-checkout:hover {
+            background-color: #45a049;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
     <header>
         <nav>
             <h1>J. Market</h1>
-                <input type="text">
-                    <ul>
-                        <li>
-                            <a href="#">Sign Up / Sign in</a>
-                        </li>
-                        <li>
-                            <a href="#">Cart</a>
-                        </li>
-                    </ul>
+            <input type="text" id="searchbar" placeholder="¿Qué buscas?">
+            <ul>
+                <li><a href="#">Sign in</a></li>
+                <li class="cart-badge">
+                    <a href="#" id="open-cart">Cart</a>
+                    <span class="cart-count" id="cart-count">0</span>
+                </li>
+            </ul>
         </nav>
     </header>
-        <hr>
+    <hr>
 
-        <div class="category-container">
-            <div class="tshirts">
-                <ul>
-                    <li><a href="#">Camisetas</a></li>
-                </ul>
+    <div class="category-container">
+        <div class="category">
+            <ul><li><a href="#" data-category="todos" class="category-link active">Todos</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="camisetas" class="category-link">Camisetas</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="pantalones" class="category-link">Pantalones</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="chaquetas" class="category-link">Chaquetas</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="vestidos" class="category-link">Vestidos</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="sudaderas" class="category-link">Sudaderas</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="camisas" class="category-link">Camisas</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="faldas" class="category-link">Faldas</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="deportiva" class="category-link">Deporte</a></li></ul>
+        </div>
+        <div class="category">
+            <ul><li><a href="#" data-category="sueteres" class="category-link">Suéteres</a></li></ul>
+        </div>
+    </div>
+
+    <div class="container producto" id="productos-container">
+        <!-- Los productos se cargarán aquí -->
+    </div>
+
+    <!-- Modal del Carrito -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Tu Carrito</h2>
+                <button class="close-cart" id="close-cart">&times;</button>
             </div>
-            <div class="pants">
-                <ul>
-                    <li><a href="#">Pantalones</a></li>
-                </ul>
+            <div id="cart-items">
+                <!-- Los items del carrito se cargarán aquí -->
             </div>
-            <div class="jackets">
-                <ul>
-                    <li><a href="#">Chaquetas</a></li>
-                </ul>
-            </div>
-            <div class="dress">
-                <ul>
-                    <li><a href="#">Vestidos</a></li>
-                </ul>
-            </div>
-            <div class="hoodie">
-                <ul>
-                    <li><a href="#">Sudaderas</a></li>
-                </ul>
-            </div>
-            <div class="shirts">
-                <ul>
-                    <li><a href="#">Camisas</a></li>
-                </ul>
-            </div>
-            <div class="skirts">
-                <ul>
-                    <li><a href="#">Faldas</a></li>
-                </ul>
-            </div>
-            <div class="sport">
-                <ul>
-                    <li><a href="#">Deporte</a></li>
-                </ul>
-            </div>
-            <div class="jersey">
-                <ul>
-                    <li><a href="#">Sueteres</a></li>
-                </ul>
+            <div class="cart-total">
+                <h3>Total: $<span id="cart-total">0</span></h3>
+                <button class="btn-checkout" id="checkout-btn">Finalizar Compra</button>
             </div>
         </div>
+    </div>
 
-        <div class="ad">
-            <h2>Black Friday</h2>
-            <h2>ON ALL PRODUCTS</h2>
-            <h3>UP to 80% OFF</h3>
-        </div>
+    <script>
+        // Datos de productos (simulando el JSON)
+        const productosData = {
+            "productos": [
+                {
+                    "id": 1,
+                    "nombre": "Camiseta Básica Blanca",
+                    "categoria": "camisetas",
+                    "precio": 25000,
+                    "descripcion": "Camiseta de algodón 100% con cuello redondo.",
+                    "imagen": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
+                    "stock": 150
+                },
+                {
+                    "id": 2,
+                    "nombre": "Jeans Slim Fit Azul",
+                    "categoria": "pantalones",
+                    "precio": 89000,
+                    "descripcion": "Jeans de corte slim fit con acabado stonewash.",
+                    "imagen": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=500&fit=crop",
+                    "stock": 85
+                },
+                {
+                    "id": 3,
+                    "nombre": "Chaqueta de Cuero",
+                    "categoria": "chaquetas",
+                    "precio": 285000,
+                    "descripcion": "Chaqueta de cuero sintético con cierre frontal.",
+                    "imagen": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
+                    "stock": 45
+                },
+                {
+                    "id": 4,
+                    "nombre": "Vestido Floral de Verano",
+                    "categoria": "vestidos",
+                    "precio": 95000,
+                    "descripcion": "Vestido ligero con estampado floral.",
+                    "imagen": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&h=500&fit=crop",
+                    "stock": 60
+                },
+                {
+                    "id": 5,
+                    "nombre": "Sudadera con Capucha",
+                    "categoria": "sudaderas",
+                    "precio": 65000,
+                    "descripcion": "Sudadera cómoda con capucha y bolsillo tipo canguro.",
+                    "imagen": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop",
+                    "stock": 120
+                },
+                {
+                    "id": 6,
+                    "nombre": "Camisa Formal Blanca",
+                    "categoria": "camisas",
+                    "precio": 75000,
+                    "descripcion": "Camisa de vestir en algodón premium.",
+                    "imagen": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&h=500&fit=crop",
+                    "stock": 90
+                },
+                {
+                    "id": 7,
+                    "nombre": "Falda Midi Plisada",
+                    "categoria": "faldas",
+                    "precio": 55000,
+                    "descripcion": "Falda midi con pliegues y cintura elástica.",
+                    "imagen": "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=500&h=500&fit=crop",
+                    "stock": 70
+                },
+                {
+                    "id": 8,
+                    "nombre": "Shorts Deportivos",
+                    "categoria": "deportiva",
+                    "precio": 35000,
+                    "descripcion": "Shorts ligeros con tecnología dry-fit.",
+                    "imagen": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500&h=500&fit=crop",
+                    "stock": 110
+                },
+                {
+                    "id": 9,
+                    "nombre": "Blazer Elegante",
+                    "categoria": "chaquetas",
+                    "precio": 185000,
+                    "descripcion": "Blazer estructurado con botones frontales.",
+                    "imagen": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=500&h=500&fit=crop",
+                    "stock": 55
+                },
+                {
+                    "id": 10,
+                    "nombre": "Suéter de Lana",
+                    "categoria": "sueteres",
+                    "precio": 95000,
+                    "descripcion": "Suéter tejido en lana merino suave.",
+                    "imagen": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&h=500&fit=crop",
+                    "stock": 75
+                },
+                {
+                    "id": 11,
+                    "nombre": "Leggings Deportivos",
+                    "categoria": "deportiva",
+                    "precio": 45000,
+                    "descripcion": "Leggings de alta compresión con cintura alta.",
+                    "imagen": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=500&h=500&fit=crop",
+                    "stock": 95
+                },
+                {
+                    "id": 12,
+                    "nombre": "Polo Clásico",
+                    "categoria": "camisetas",
+                    "precio": 55000,
+                    "descripcion": "Polo de algodón piqué con cuello y botones.",
+                    "imagen": "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=500&h=500&fit=crop",
+                    "stock": 130
+                }
+            ]
+        };
 
-        <!-- TODO: GRID -->
+        // Estado de la aplicación
+        let carrito = [];
+        let categoriaActual = 'todos';
+        let busquedaActual = '';
+
+        // Elementos del DOM
+        const productosContainer = document.getElementById('productos-container');
+        const searchBar = document.getElementById('searchbar');
+        const cartModal = document.getElementById('cart-modal');
+        const cartCount = document.getElementById('cart-count');
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+
+        // Renderizar productos
+        function renderizarProductos(productos) {
+            productosContainer.innerHTML = '';
+            
+            if (productos.length === 0) {
+                productosContainer.innerHTML = '<div class="no-results"><p>No se encontraron productos</p></div>';
+                return;
+            }
+
+            productos.forEach(producto => {
+                const card = document.createElement('div');
+                card.className = 'card producto';
+                card.innerHTML = `
+                    <img src="${producto.imagen}" alt="${producto.nombre}">
+                    <h2>${producto.nombre}</h2>
+                    <p class="precio">$${producto.precio.toLocaleString('es-CO')}</p>
+                    <p class="id-producto">ID: ${producto.id}</p>
+                    <button class="btn-add-cart" onclick="agregarAlCarrito(${producto.id})">
+                        Añadir al Carrito
+                    </button>
+                `;
+                productosContainer.appendChild(card);
+            });
+        }
+
+        // Filtrar productos
+        function filtrarProductos() {
+            let productosFiltrados = productosData.productos;
+
+            // Filtrar por categoría
+            if (categoriaActual !== 'todos') {
+                productosFiltrados = productosFiltrados.filter(p => p.categoria === categoriaActual);
+            }
+
+            // Filtrar por búsqueda
+            if (busquedaActual) {
+                productosFiltrados = productosFiltrados.filter(p => 
+                    p.nombre.toLowerCase().includes(busquedaActual.toLowerCase()) ||
+                    p.descripcion.toLowerCase().includes(busquedaActual.toLowerCase())
+                );
+            }
+
+            renderizarProductos(productosFiltrados);
+        }
+
+        // Añadir al carrito
+        function agregarAlCarrito(idProducto) {
+            const producto = productosData.productos.find(p => p.id === idProducto);
+            if (!producto) return;
+
+            const itemExistente = carrito.find(item => item.id === idProducto);
+
+            if (itemExistente) {
+                itemExistente.cantidad++;
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+
+            actualizarCarrito();
+            mostrarNotificacion('Producto añadido al carrito');
+        }
+
+        // Actualizar carrito
+        function actualizarCarrito() {
+            cartCount.textContent = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            
+            if (carrito.length === 0) {
+                cartItems.innerHTML = '<div class="empty-cart"><p>Tu carrito está vacío</p></div>';
+                cartTotal.textContent = '0';
+                return;
+            }
+
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            carrito.forEach(item => {
+                total += item.precio * item.cantidad;
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <h3>${item.nombre}</h3>
+                        <p>$${item.precio.toLocaleString('es-CO')} x ${item.cantidad}</p>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button onclick="cambiarCantidad(${item.id}, -1)" style="padding: 5px 10px; cursor: pointer;">-</button>
+                        <span>${item.cantidad}</span>
+                        <button onclick="cambiarCantidad(${item.id}, 1)" style="padding: 5px 10px; cursor: pointer;">+</button>
+                        <button class="btn-remove" onclick="eliminarDelCarrito(${item.id})">Eliminar</button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            cartTotal.textContent = total.toLocaleString('es-CO');
+        }
+
+        // Cambiar cantidad
+        function cambiarCantidad(idProducto, cambio) {
+            const item = carrito.find(i => i.id === idProducto);
+            if (!item) return;
+
+            item.cantidad += cambio;
+
+            if (item.cantidad <= 0) {
+                eliminarDelCarrito(idProducto);
+            } else {
+                actualizarCarrito();
+            }
+        }
+
+        // Eliminar del carrito
+        function eliminarDelCarrito(idProducto) {
+            carrito = carrito.filter(item => item.id !== idProducto);
+            actualizarCarrito();
+        }
+
+        // Mostrar notificación
+        function mostrarNotificacion(mensaje) {
+            // Puedes implementar una notificación más elaborada
+            console.log(mensaje);
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.category-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.category-link').forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+                categoriaActual = e.target.dataset.category;
+                filtrarProductos();
+            });
+        });
+
+        searchBar.addEventListener('input', (e) => {
+            busquedaActual = e.target.value;
+            filtrarProductos();
+        });
+
+        document.getElementById('open-cart').addEventListener('click', (e) => {
+            e.preventDefault();
+            cartModal.classList.add('show');
+        });
+
+        document.getElementById('close-cart').addEventListener('click', () => {
+            cartModal.classList.remove('show');
+        });
+
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.remove('show');
+            }
+        });
+
+        document.getElementById('checkout-btn').addEventListener('click', () => {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            alert('¡Gracias por tu compra! Total: $' + cartTotal.textContent);
+            carrito = [];
+            actualizarCarrito();
+            cartModal.classList.remove('show');
+        });
+
+        // Inicializar
+        filtrarProductos();
+    </script>
 </body>
-</html>
+</html> 
